@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  web:
+    container_name: golang-skeleton-web
+    build: '.'
+    ports:
+      - '8088:8080'
+      - '40000:40000'
+    volumes:
+      - ./:/go/app
+  database:
+    container_name: mongo-skeleton-web
+    image: mongo:6-jammy
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    volumes:
+      - ./dbdata:/data/db
+    ports:
+      - '10018:27017'
+networks:
+  mongo_go_default:
