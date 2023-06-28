@@ -1,27 +1,13 @@
-# syntax=docker/dockerfile:1
-
-FROM golang:1.19
-
-# Set destination for COPY
-WORKDIR /go/app
-
-# Download Go modules
-COPY go.mod go.sum ./
-
+FROM golang:1.20.5-alpine3.18
+ENV CGO_ENABLED 0
+RUN apk update && apk add bash inotify-tools
+RUN mkdir /build/
+WORKDIR /build/
+COPY startScript.sh /build/startScript.sh
+COPY . /build/
 RUN go mod download
-
-# Copy the source code. Note the slash at the end, as explained in
-# https://docs.docker.com/engine/reference/builder/#copy
-COPY ./ ./
-
 RUN go get go-skeleton-dockerized
-
 RUN go get go.mongodb.org/mongo-driver
-
-# Build
-RUN go build -o /main .
-
-RUN rm go.mod
-
-# Run
-CMD ["/main"]
+RUN go build -gcflags "all=-N -l" -o /server .
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+ENTRYPOINT sh startScript.sh

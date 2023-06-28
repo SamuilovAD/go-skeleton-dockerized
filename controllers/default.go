@@ -14,15 +14,13 @@ type MainController struct {
 	beego.Controller
 }
 
-type User = models.User
+type User1 = models.User1
 
 func (c *MainController) Get() {
-	c.Data["Website"] = "beego.vip"
-	c.Data["Email"] = "astaxie@gmail.com"
-	c.TplName = "index.tpl"
+	var result string = ""
 
 	// Replace the connection string with your own
-	client, err := mongorm.Connect("mongodb://localhost:27017")
+	client, err := mongorm.Connect("mongodb://mongo-skeleton-web:27017")
 	if err != nil {
 		panic(err)
 	}
@@ -30,7 +28,7 @@ func (c *MainController) Get() {
 	db := client.Database("test_db")
 
 	// Create a new user
-	user := User{
+	user := User1{
 		FirstName: "John",
 		LastName:  "Doe",
 		Email:     "john.doe@example.com",
@@ -39,15 +37,15 @@ func (c *MainController) Get() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("User created: %v\n", user)
+	result += fmt.Sprintf("User created: %v\n", user)
 
 	// Read a user by ID
-	var readUser User
+	var readUser User1
 	err = readUser.Read(context.Background(), db, "users", bson.M{"_id": user.ID}, &readUser)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("User read: %v\n", readUser)
+	result += fmt.Sprintf("User read: %v\n", readUser)
 
 	// Update a user's email
 	update := bson.M{"$set": bson.M{"email": "john.doe_updated@example.com", "updated_at": primitive.NewDateTimeFromTime(user.UpdatedAt)}}
@@ -55,12 +53,15 @@ func (c *MainController) Get() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("User updated: %v\n", user)
+	result += fmt.Sprintf("User updated: %v\n", user)
 
 	// Delete a user by ID
 	err = user.Delete(context.Background(), db, "users", bson.M{"_id": user.ID})
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("User deleted")
+	result += fmt.Sprintf("User deleted")
+
+	c.Data["json"] = result
+	c.ServeJSON()
 }

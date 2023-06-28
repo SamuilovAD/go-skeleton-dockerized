@@ -1,0 +1,18 @@
+FROM golang:1.20.5-alpine3.18 as build-env
+ENV CGO_ENABLED 0
+# Allow Go to retreive the dependencies for the build step
+RUN apk add --no-cache git
+WORKDIR /go/app
+COPY ./ ./
+RUN go mod download
+RUN go get go-skeleton-dockerized
+RUN go get go.mongodb.org/mongo-driver
+RUN go build -o /go/src/app/main .
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+# final stage
+FROM alpine:3.18
+WORKDIR /
+COPY --from=build-env /go/app/main /go/app/build/main
+COPY --from=build-env /go/bin/dlv /dlv
+
+ENTRYPOINT ["/dlv"]

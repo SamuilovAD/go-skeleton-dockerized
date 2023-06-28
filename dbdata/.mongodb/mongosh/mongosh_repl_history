@@ -1,2 +1,11 @@
+db.testColeection.findOne({test:"data"})
+db.testColeection.insertOne({test:"data"})
+use test_db
+show dbs
+exit
+db.testColeection.insertOne({test:"data"})
+db.testColeection.insetOne({test:"data"})
+use test_db
+show dbs
 exit
 show dbs
