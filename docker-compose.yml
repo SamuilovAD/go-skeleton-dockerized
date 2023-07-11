@@ -8,6 +8,8 @@ services:
       - '40000:40000'
     depends_on:
       - 'mongo-skeleton-web'
+    volumes:
+      - .:/app
   mongo-skeleton-web:
     container_name: mongo-skeleton-web
     image: mongo:6-jammy

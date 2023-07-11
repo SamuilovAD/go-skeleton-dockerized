@@ -68,7 +68,7 @@ unlockBuild() {
 # run the server for the first time
 runServer
 
-inotifywait -e MODIFY -r -m /build |
+inotifywait -e MODIFY -r -m /app |
   while read path action file; do
     lockBuild
       ext=${file: -3}
